@@ -6,7 +6,7 @@
 typedef struct node
 {
     int vertex;                /*Index to adjacency list array*/
-    struct adjlist_node *next; /*Pointer to the next node*/
+    struct node *next; /*Pointer to the next node*/
 }node, *nodeP;
 
 /* Adjacency list */

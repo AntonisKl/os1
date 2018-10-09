@@ -9,7 +9,7 @@ void errCatch(char* errmsg){
 }
 
 void menuOpts(){
-	printf("Write the letter not in parentheses or the full word:"
+	printf("\nWrite the letter not in parentheses or the full word:\n"
 		   "1. i(nsert) new Node ni\n"
 		   "2. (i)n(sert) new Node Weight ni nj\n"
 		   "3. d(elete) Node ni\n"
@@ -23,34 +23,34 @@ void menuOpts(){
 }
 
 int checkUserInput(char **tokens){
-	if( strcmp(*tokens[0], "i") || strcmp(*tokens[0], "insert")){
+	if( strcmp(tokens[0], "i") || strcmp(tokens[0], "insert")){
 
 	}
-	else if( strcmp(*tokens[0], "n") || strcmp(*tokens[0], "insert")){
+	else if( strcmp(tokens[0], "n") || strcmp(tokens[0], "insert")){
 		
 	}
-	else if( strcmp(*tokens[0], "d") || strcmp(*tokens[0], "delete")){
+	else if( strcmp(tokens[0], "d") || strcmp(tokens[0], "delete")){
 		
 	}
-	else if( strcmp(*tokens[0], "l") || strcmp(*tokens[0], "delete")){
+	else if( strcmp(tokens[0], "l") || strcmp(tokens[0], "delete")){
 		
 	}
-	else if( strcmp(*tokens[0], "m") || strcmp(*tokens[0], "modify")){
+	else if( strcmp(tokens[0], "m") || strcmp(tokens[0], "modify")){
 		
 	}
-	else if( strcmp(*tokens[0], "r") || strcmp(*tokens[0], "receiving")){
+	else if( strcmp(tokens[0], "r") || strcmp(tokens[0], "receiving")){
 		
 	}
-	else if( strcmp(*tokens[0], "c") || strcmp(*tokens[0], "circlefind")){
+	else if( strcmp(tokens[0], "c") || strcmp(tokens[0], "circlefind")){
 		
 	}
-	else if( strcmp(*tokens[0], "f") || strcmp(*tokens[0], "findcircles")){
+	else if( strcmp(tokens[0], "f") || strcmp(tokens[0], "findcircles")){
 		
 	}
-	else if( strcmp(*tokens[0], "t") || strcmp(*tokens[0], "traceflow")){
+	else if( strcmp(tokens[0], "t") || strcmp(tokens[0], "traceflow")){
 		
 	}
-	else if( strcmp(*tokens[0], "e") || strcmp(*tokens[0], "exit"))
+	else if( strcmp(tokens[0], "e") || strcmp(tokens[0], "exit"))
 		return 1;
 	else{
 		errCatch("Invalid command");
@@ -67,13 +67,13 @@ int main(int argc, char *argv[]){
 	/* Checking for Command Line Arguments */
     if(argc == 1)
         fptr = NULL;
-    else if( argc == 3 && !strcmp(*argv[1], "-i"))
-    	fptr = fopen(*argv[2], "r");
-    else if( argc == 3 && !strcmp(*argv[1], "-o"))
-    	fptr = fopen(*argv[2], "w+");
+    else if( argc == 3 && !strcmp(argv[1], "-i"))
+    	fptr = fopen(argv[2], "r");
+    else if( argc == 3 && !strcmp(argv[1], "-o"))
+    	fptr = fopen(argv[2], "w+");
     else if( argc == 5 ){
-    	fptr = fopen(*argv[2], "r");
-    	fptr = fopen(*argv[4], "w+");
+    	fptr = fopen(argv[2], "r");
+    	fptr = fopen(argv[4], "w+");
     }
     else
     	errCatch("Wrong number/format of arguments.");
@@ -89,11 +89,17 @@ int main(int argc, char *argv[]){
 
     while(exit){
     	menuOpts();
-    	scanf("opt", &userOpt);
+		fgets(userOpt, 50, stdin);
+    	//scanf("opt", &userOpt);
     	i = 0;
+		printf("\ncheck\n");
     	token[i] = strtok(userOpt, " ");
+		printf("\n %s \n", token[0]);
+		printf("\ncheck\n");
+		//Check this assignment tomorrow
     	while( (token[i] = strtok(NULL, " ")) != NULL)
     		i++;
+		printf("\n %s \n", token[0]);
     	if(checkUserInput(token) == 1)
     		exit = false;
     }
