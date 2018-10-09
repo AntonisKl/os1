@@ -86,21 +86,21 @@ void displayGraph(graphP graph){
     }
 }
 
-int main(){
-    graphP undir_graph = createGraph(5);
-    addEdge(undir_graph, 0, 1);
-    addEdge(undir_graph, 0, 4);
-    addEdge(undir_graph, 1, 2);
-    addEdge(undir_graph, 1, 3);
-    addEdge(undir_graph, 1, 4);
-    addEdge(undir_graph, 2, 3);
-    addEdge(undir_graph, 3, 4);
-    addEdge(undir_graph, 4, 0);
+// int main(){
+//     graphP undir_graph = createGraph(5);
+//     addEdge(undir_graph, 0, 1);
+//     addEdge(undir_graph, 0, 4);
+//     addEdge(undir_graph, 1, 2);
+//     addEdge(undir_graph, 1, 3);
+//     addEdge(undir_graph, 1, 4);
+//     addEdge(undir_graph, 2, 3);
+//     addEdge(undir_graph, 3, 4);
+//     addEdge(undir_graph, 4, 0);
 
-    printf("\nDIRECTED GRAPH");
-    displayGraph(undir_graph);
-    destroyGraph(undir_graph);
+//     printf("\nDIRECTED GRAPH");
+//     displayGraph(undir_graph);
+//     destroyGraph(undir_graph);
 
-    return 0;
-}
+//     return 0;
+// }
 
