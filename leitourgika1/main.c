@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "graph.c"
 #include <string.h>
+#include <stdbool.h>
 
 void errCatch(char* errmsg){
 	printf("Error: %s\n", errmsg);
@@ -65,7 +66,7 @@ int main(int argc, char *argv[]){
 
 	/* Checking for Command Line Arguments */
     if(argc == 1)
-        fptr = null;
+        fptr = NULL;
     else if( argc == 3 && !strcmp(*argv[1], "-i"))
     	fptr = fopen(*argv[2], "r");
     else if( argc == 3 && !strcmp(*argv[1], "-o"))
@@ -91,12 +92,10 @@ int main(int argc, char *argv[]){
     	scanf("opt", &userOpt);
     	i = 0;
     	token[i] = strtok(userOpt, " ");
-    	while( (token[i] = strtok(null, " ")) != null)
+    	while( (token[i] = strtok(NULL, " ")) != NULL)
     		i++;
     	if(checkUserInput(token) == 1)
     		exit = false;
-    	else
-    		
     }
 
 }
