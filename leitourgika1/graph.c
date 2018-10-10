@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include "graph.h"
 
+/* 
+    A graph is comprised of a list (in our case, the nodes) 
+    of lists (in our case, the edges). 
+    Each node has an identifier (a string), which is used as an argument 
+    for when the user wants to add a new edge between two nodes. 
+*/
+
 /* Exit function to handle fatal errors*/
 void err_exit(char* msg){
     printf("Error: %s \nExiting...\n", msg);
@@ -9,54 +16,61 @@ void err_exit(char* msg){
 }
 
 /* Function to create an adjacency list node*/
-nodeP createNode(int v){
-    nodeP newNode = (nodeP)malloc(sizeof(node));
+nodeP createNode(graphP myGraph, char *nodeIdentifier){
+    listP newNode = (listP)malloc(sizeof(list));
     if(!newNode)
         err_exit("Unable to allocate memory for new node");
 
-    newNode->vertex = v;
+    listP tempList = myGraph->adjList;
+
+    while(tempList->next != NULL){
+        tempList = tempList->next;
+    }
+
+    newNode->head->data = nodeIdentifier;
     newNode->next = NULL;
+    tempList->next = newNode;
+    myGraph->num_vertices++;
 
     return newNode;
 }
 
 /* Function to create a graph with n vertices*/
-graphP createGraph(int n){
+graphP createGraph(){
     //Allocate space for the graph
     graphP graph = (graphP)malloc(sizeof(graph));
     if(!graph)
         err_exit("Unable to allocate memory for graph");
+
     //Store number of vertices
-    graph->num_vertices = n;
+    graph->num_vertices = 0;
 
-    /* Create an array of adjacency lists*/
-    graph->adjListArr = (listP)malloc(n * sizeof(list));
-    if(!graph->adjListArr)
-        err_exit("Unable to allocate memory for adjacency list array");
-
-    for(int i = 0; i < n; i++){
-        //Initialize adjacency list nodes
-        graph->adjListArr[i].head = NULL;
-        graph->adjListArr[i].num_members = 0;
-    }
+    //Initialize adjacency list nodes
+    graph->adjList.head = NULL;
+    graph->adjList.next = NULL;
+    graph->adjList.num_members = 0;
     return graph;
 }
 
 /*Destroys the graph*/
 void destroyGraph(graphP graph){
     if(graph){
-        if(graph->adjListArr){
+        if(graph->adjList){
             /*Free up the nodes*/
-            for (int i = 0; i < graph->num_vertices; i++){
-                nodeP adjListPtr = graph->adjListArr[i].head;
+            listP tempList = graph->adjList;
+            while(tempList){
+                nodeP adjListPtr = graph->adjList->head;
                 while (adjListPtr){
                     nodeP tmp = adjListPtr;
                     adjListPtr = adjListPtr->next;
                     free(tmp);
                 }
+                listP freeList = tempList;
+                tempList = tempList->next;
+                free(freeList);
             }
             /*Free the adjacency list array*/
-            free(graph->adjListArr);
+            free(graph->adjList);
         }
         /*Free the graph*/
         free(graph);
@@ -64,7 +78,7 @@ void destroyGraph(graphP graph){
 }
 
 /* Adds an edge to a graph*/
-void addEdge(graph *graph, int src, int dest){
+void addEdge(graph *graph, int idSource, int idDest){
     /* Add an edge from src to dst in the adjacency list*/
     nodeP newNode = createNode(dest);
     newNode->next = graph->adjListArr[src].head;
@@ -85,22 +99,3 @@ void displayGraph(graphP graph){
         printf("NULL\n");
     }
 }
-
-// int main(){
-//     graphP undir_graph = createGraph(5);
-//     addEdge(undir_graph, 0, 1);
-//     addEdge(undir_graph, 0, 4);
-//     addEdge(undir_graph, 1, 2);
-//     addEdge(undir_graph, 1, 3);
-//     addEdge(undir_graph, 1, 4);
-//     addEdge(undir_graph, 2, 3);
-//     addEdge(undir_graph, 3, 4);
-//     addEdge(undir_graph, 4, 0);
-
-//     printf("\nDIRECTED GRAPH");
-//     displayGraph(undir_graph);
-//     destroyGraph(undir_graph);
-
-//     return 0;
-// }
-
