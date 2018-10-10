@@ -64,6 +64,8 @@ int main(int argc, char *argv[]){
 	FILE *fptr;
 	int i;
 
+	graphP myGraph = createGraph();
+
 	/* Checking for Command Line Arguments */
     if(argc == 1)
         fptr = NULL;

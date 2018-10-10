@@ -5,7 +5,9 @@
 /* Adjacency list node*/
 typedef struct node
 {
-	char *data;
+	char *nodeId;
+	char *destId = NULL;
+	int edgeWeight;
     struct node *next; /*Pointer to the next node*/
 }node, *nodeP;
 
