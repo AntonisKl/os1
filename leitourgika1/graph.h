@@ -6,7 +6,7 @@
 typedef struct node
 {
 	char *nodeId;
-	char *destId = NULL;
+	char *destId;
 	int edgeWeight;
     struct node *next; /*Pointer to the next node*/
 }node, *nodeP;
@@ -16,7 +16,7 @@ typedef struct adjlist
 {
     int num_members;           /*number of members in the list (for future use)*/
     node *head;      /*head of the adjacency linked list*/
-    adjlist *next;
+    struct adjlist *next;
 }list, *listP;
 
 /* Graph structure. A graph is a list of adjacency lists. */

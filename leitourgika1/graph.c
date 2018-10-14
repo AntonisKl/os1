@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "graph.h"
 
 /* 
@@ -103,19 +104,19 @@ int addEdge(graph *graph, char *idSource, char *idDest){
         }
         tempList = tempList->next;
     }
-    newNode->next = graph->adjListArr[src].head;
-    graph->adjListArr[src].head = newNode;
-    graph->adjListArr[src].num_members++;
+    //newNode->next = graph->adjList->head;
+    //graph->adjList->head = newNode;
+    graph->adjList->num_members++;
 }
 
 /* Function to print the adjacency list of graph*/
 void displayGraph(graphP graph){
     int i;
     for (i = 0; i < graph->num_vertices; i++){
-        nodeP adjListPtr = graph->adjListArr[i].head;
+        nodeP adjListPtr = graph->adjList->head;
         printf("\n%d: ", i);
         while (adjListPtr){
-            printf("%d->", adjListPtr->vertex);
+            //printf("%d->", adjListPtr->vertex);
             adjListPtr = adjListPtr->next;
         }
         printf("NULL\n");
