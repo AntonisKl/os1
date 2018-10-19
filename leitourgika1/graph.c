@@ -27,6 +27,7 @@ void displayGraph(graphP graph){
             //printf("\t%s\n", adjListPtr->nodeId);
             adjListPtr = adjListPtr->next;
         }
+        printf("\n");
         tempList = tempList->next;
     }
 }
@@ -67,6 +68,29 @@ int createNode(graphP myGraph, char *nodeIdentifier){
     tempList->next = (listP)malloc(sizeof(list));
     tempList->next->head = (nodeP)malloc(sizeof(node));
     tempList->next->head->nodeId = (char*)malloc(sizeof(char));
+
+    printf("templist %s", tempList->head->nodeId );
+    myGraph->num_vertices++;
+
+    return 1;
+}
+
+/* Function to delete an adjacency list node*/
+int createNode(graphP myGraph, char *nodeIdentifier){
+
+    listP tempList = myGraph->adjList;
+
+    while(tempList != NULL){
+        if( !strcmp(tempList->head->nodeId, nodeIdentifier) ){
+            printf("Node %s already exists. Aborting insertion operation and returning to option selection.\n", nodeIdentifier);
+            return -1;
+        }
+        if(tempList->next != NULL){
+            tempList = tempList->next;
+        }
+        else
+            break;
+    }
 
     printf("templist %s", tempList->head->nodeId );
     myGraph->num_vertices++;
@@ -124,7 +148,7 @@ void destroyGraph(graphP graph){
 }
 
 /* Adds an edge to a graph*/
-int addEdge(graph *graph, char *idSource, char *idDest){
+int addEdge(graph *graph, char *idSource, char *idDest, int weight){
     /* Add an edge from src to dst in the adjacency list*/
     listP tempList = graph->adjList;
     nodeP destNode = NULL;

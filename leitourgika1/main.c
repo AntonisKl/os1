@@ -23,6 +23,9 @@ void menuOpts(){
 }
 
 int checkUserInput(char **tokens, graphP mygraph){
+	int count = 0;
+	while( tokens[count] != NULL )
+		count++;
 	if(  !strcmp(tokens[0], "i") ){
 		if(!strcmp(tokens[1], "\0"))
 			errCatch("Wrong Number of Arguments.");
@@ -32,10 +35,10 @@ int checkUserInput(char **tokens, graphP mygraph){
 		// printf("%s\n",mygraph->)
 	}
 	else if( !strcmp(tokens[0], "n") ){
-		if(!strcmp(tokens[1], "\0"))
-			errCatch("Wrong Number of Arguments.");
+		if(count == 4)
+			addEdge(mygraph, tokens[1], tokens[2], atoi(tokens[3]));
 		else
-			createNode(mygraph, tokens[1]);
+			err_exit("Wrong number of Arguments.");
 		return 0;
 	}
 	else if( !strcmp(tokens[0], "d") ){
@@ -109,7 +112,6 @@ int main(int argc, char *argv[]){
     		i++;
 			token[i] = strtok(NULL, " \n");
 		}
-		
     	if(checkUserInput(token, myGraph) == 1)
     		exit = false;
 		displayGraph(myGraph);
