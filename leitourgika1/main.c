@@ -22,35 +22,44 @@ void menuOpts(){
 		   "10. e(xit) - Free allocated memory and exit program\n");
 }
 
-int checkUserInput(char **tokens){
-	if( strcmp(tokens[0], "i") || strcmp(tokens[0], "insert")){
-
+int checkUserInput(char **tokens, graphP mygraph){
+	if(  !strcmp(tokens[0], "i") ){
+		if(!strcmp(tokens[1], "\0"))
+			errCatch("Wrong Number of Arguments.");
+		else
+			createNode(mygraph, tokens[1]);
+		return 0;
+		// printf("%s\n",mygraph->)
 	}
-	else if( strcmp(tokens[0], "n") || strcmp(tokens[0], "insert")){
-		
+	else if( !strcmp(tokens[0], "n") ){
+		if(!strcmp(tokens[1], "\0"))
+			errCatch("Wrong Number of Arguments.");
+		else
+			createNode(mygraph, tokens[1]);
+		return 0;
 	}
-	else if( strcmp(tokens[0], "d") || strcmp(tokens[0], "delete")){
-		
+	else if( !strcmp(tokens[0], "d") ){
+		printf("Input is d\n");
 	}
-	else if( strcmp(tokens[0], "l") || strcmp(tokens[0], "delete")){
-		
+	else if( !strcmp(tokens[0], "l") ){
+		printf("Input is l\n");
 	}
-	else if( strcmp(tokens[0], "m") || strcmp(tokens[0], "modify")){
-		
+	else if( !strcmp(tokens[0], "m") ){
+		printf("Input is m\n");
 	}
-	else if( strcmp(tokens[0], "r") || strcmp(tokens[0], "receiving")){
-		
+	else if( !strcmp(tokens[0], "r") ){
+		printf("Input is r\n");
 	}
-	else if( strcmp(tokens[0], "c") || strcmp(tokens[0], "circlefind")){
-		
+	else if( !strcmp(tokens[0], "c") ){
+		printf("Input is c\n");
 	}
-	else if( strcmp(tokens[0], "f") || strcmp(tokens[0], "findcircles")){
-		
+	else if( !strcmp(tokens[0], "f") ){
+		printf("Input is f\n");
 	}
-	else if( strcmp(tokens[0], "t") || strcmp(tokens[0], "traceflow")){
-		
+	else if( !strcmp(tokens[0], "t") ){
+		printf("Input is t\n");
 	}
-	else if( strcmp(tokens[0], "e") || strcmp(tokens[0], "exit"))
+	else if( !strcmp(tokens[0], "e") )
 		return 1;
 	else{
 		errCatch("Invalid command");
@@ -64,14 +73,14 @@ int main(int argc, char *argv[]){
 	FILE *fptr;
 	int i;
 
-	graphP myGraph = createGraph();
-
+	graphP myGraph = createGraph();	
+	//displayGraph(myGraph);
 	/* Checking for Command Line Arguments */
     if(argc == 1)
         fptr = NULL;
-    else if( argc == 3 && !strcmp(argv[1], "-i"))
+    else if( argc == 3 && !!strcmp(argv[1], "-i"))
     	fptr = fopen(argv[2], "r");
-    else if( argc == 3 && !strcmp(argv[1], "-o"))
+    else if( argc == 3 && !!strcmp(argv[1], "-o"))
     	fptr = fopen(argv[2], "w+");
     else if( argc == 5 ){
     	fptr = fopen(argv[2], "r");
@@ -94,16 +103,16 @@ int main(int argc, char *argv[]){
 		fgets(userOpt, 50, stdin);
     	//scanf("opt", &userOpt);
     	i = 0;
-		printf("\ncheck\n");
-    	token[i] = strtok(userOpt, " ");
-		printf("\n %s \n", token[0]);
-		printf("\ncheck\n");
+    	token[i] = strtok(userOpt, " \n");
 		//Check this assignment tomorrow
-    	while( (token[i] = strtok(NULL, " ")) != NULL)
+    	while( token[i] != NULL){
     		i++;
-		printf("\n %s \n", token[0]);
-    	if(checkUserInput(token) == 1)
+			token[i] = strtok(NULL, " \n");
+		}
+		
+    	if(checkUserInput(token, myGraph) == 1)
     		exit = false;
+		displayGraph(myGraph);
     }
 
 }
