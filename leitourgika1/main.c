@@ -77,7 +77,11 @@ int checkUserInput(char **tokens, graphP mygraph){
 		return 0;
 	}
 	else if( !strcmp(tokens[0], "f") ){
-		printf("Input is f\n");
+		if(count == 3)
+			findCircles(mygraph, tokens[1], tokens[2]);
+		else
+			err_exit("Wrong number of Arguments.");
+		return 0;
 	}
 	else if( !strcmp(tokens[0], "t") ){
 		printf("Input is t\n");
