@@ -70,25 +70,101 @@ int createNode(graphP myGraph, char *nodeIdentifier){
     return 1;
 }
 
+// listP edgeDelete(listP currP, char *nodeId, char *edgeId, int weight){
+//   /* See if we are at end of list. */
+//   if (currP == NULL)
+//     return NULL;
+//   if (!strcmp(currP->nodeId, nodeId)) {
+//     listP tempNextP;
+//     edgeP currEdge = currP->head;
+//     edgeP nextEdge;
+//     while(currEdge!=NULL){
+        // if( !strcmp(currEdge->edgeId, edgeId) && currEdge->edgeWeight == weight ){
+        //     nextEdge = currEdge->next;
+        //     free(currEdge);
+        //     currEdge = nextEdge;
+        // }
+        // currEdge = currEdge->next;
+//     }
+//   }
+//   currP->next = edgeDelete(currP->next, nodeId, edgeId, weight);
+//   return currP;
+// }
+
+listP nodeDelete(listP currP, char *id)
+{
+  /* See if we are at end of list. */
+  if (currP == NULL)
+    return NULL;
+  if (!strcmp(currP->nodeId, id)) {
+    listP tempNextP;
+    edgeP currEdge = currP->head;
+    edgeP nextEdge;
+    while(currEdge!=NULL){
+        nextEdge = currEdge->next;
+        free(currEdge);
+        currEdge = nextEdge;
+    }
+    tempNextP = currP->next;
+    free(currP);
+    return tempNextP;
+  }
+  currP->next = nodeDelete(currP->next, id);
+  return currP;
+}
+
+int deleteEdge(graphP myGraph, char *nodeId, char *edgeId, int weight){
+    //myGraph->adjList = edgeDelete(myGraph->adjList, nodeId, edgeId, weight);
+    listP tempList = myGraph->adjList;
+    while(tempList != NULL){
+        edgeP tempEdge = tempList->head;
+        edgeP nextEdge;
+        while(tempEdge != NULL){
+            if( !strcmp(tempEdge->edgeId, edgeId) && tempEdge->edgeWeight == weight ){
+                nextEdge = tempEdge->next;
+                free(tempEdge);
+                tempEdge = nextEdge;
+            }
+            tempEdge = tempEdge->next;
+        }
+        tempList = tempList->next;
+    }
+}
+
+int modifyWeight( graphP myGraph, char *nodeId, char *edgeId, int oldWeight, int newWeight){
+    listP tempList = myGraph->adjList;
+    while(tempList != NULL){
+        edgeP tempEdge = tempList->head;
+        while(tempEdge != NULL){
+            if( !strcmp(tempEdge->edgeId, edgeId) && tempEdge->edgeWeight == oldWeight ){
+                tempEdge->edgeWeight = newWeight;
+                return 1;
+            }
+            tempEdge = tempEdge->next;
+        }
+        tempList = tempList->next;
+    }
+}
+
 /* Function to delete an adjacency list node*/
 int deleteNode(graphP myGraph, char *nodeIdentifier){
-
-    listP tempList = myGraph->adjList;
-
-    while(tempList != NULL){
-        if( !strcmp(tempList->nodeId, nodeIdentifier) ){
-            
-        }
-        if(tempList->next != NULL){
-            tempList = tempList->next;
-        }
-        else
-            break;
-    }
-
-    myGraph->num_vertices++;
-
+    myGraph->adjList = nodeDelete(myGraph->adjList, nodeIdentifier);
     return 1;
+}
+
+int showTransactions(graphP myGraph, char *receivingNodeId){
+    listP tempList = myGraph->adjList;
+    while(tempList){
+        edgeP tempEdge = tempList->head;
+        while(tempEdge){
+            if(!strcmp(tempEdge->edgeId, receivingNodeId)){
+                printf("Node %s is receiving a transaction weighing %d from node %s\n", 
+                tempEdge->edgeId, tempEdge->edgeWeight, tempList->nodeId);
+            }
+            tempEdge = tempEdge->next;
+        }
+        tempList = tempList->next;
+    } 
 }
 
 /* Function to create a graph with n vertices*/

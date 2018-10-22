@@ -9,7 +9,7 @@ void errCatch(char* errmsg){
 }
 
 void menuOpts(){
-	printf("\nWrite the letter not in parentheses or the full word:\n"
+	printf("\nWrite the letter not in parentheses:\n"
 		   "1. i(nsert) new Node ni\n"
 		   "2. (i)n(sert) new Node Weight ni nj\n"
 		   "3. d(elete) Node ni\n"
@@ -42,19 +42,39 @@ int checkUserInput(char **tokens, graphP mygraph){
 		return 0;
 	}
 	else if( !strcmp(tokens[0], "d") ){
-		printf("Input is d\n");
+		if(count == 2)
+			deleteNode(mygraph, tokens[1]);
+		else
+			err_exit("Wrong number of Arguments.");
+		return 0;
 	}
 	else if( !strcmp(tokens[0], "l") ){
-		printf("Input is l\n");
+		if(count == 4)
+			deleteEdge(mygraph, tokens[1], tokens[2], atoi(tokens[3]));
+		else
+			err_exit("Wrong number of Arguments.");
+		return 0;
 	}
 	else if( !strcmp(tokens[0], "m") ){
-		printf("Input is m\n");
+		if(count == 5)
+			modifyWeight(mygraph, tokens[1], tokens[2], atoi(tokens[3]), atoi(tokens[4]));
+		else
+			err_exit("Wrong number of Arguments.");
+		return 0;
 	}
 	else if( !strcmp(tokens[0], "r") ){
-		printf("Input is r\n");
+		if(count == 2)
+			showTransactions(mygraph, tokens[1]);
+		else
+			err_exit("Wrong number of Arguments.");
+		return 0;
 	}
 	else if( !strcmp(tokens[0], "c") ){
-		printf("Input is c\n");
+		if(count == 2)
+			circleFind(mygraph, tokens[1]);
+		else
+			err_exit("Wrong number of Arguments.");
+		return 0;
 	}
 	else if( !strcmp(tokens[0], "f") ){
 		printf("Input is f\n");
