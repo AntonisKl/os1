@@ -21,10 +21,10 @@ void displayGraph(graphP graph){
     int i;
     listP tempList = graph->adjList;
     while(tempList->next != NULL){
-        nodeP adjListPtr = tempList->head;
-        printf("%s: ", adjListPtr->nodeId);
-        while (adjListPtr->next != NULL){
-            //printf("\t%s\n", adjListPtr->nodeId);
+        edgeP adjListPtr = tempList->head;
+        printf("%s: \t", tempList->nodeId);
+        while (adjListPtr != NULL){
+            printf("%s/%d ->", adjListPtr->edgeId, adjListPtr->edgeWeight);
             adjListPtr = adjListPtr->next;
         }
         printf("\n");
@@ -39,14 +39,13 @@ int createNode(graphP myGraph, char *nodeIdentifier){
     if(!newNode)
         err_exit("Unable to allocate memory for new node");
 
-    newNode->head = (nodeP)malloc(sizeof(node));
-    newNode->head->nodeId = (char*)malloc(10*sizeof(char));
-    newNode->head->destId = (char*)malloc(10*sizeof(char));
+    newNode->head = (edgeP)malloc(sizeof(edge));
+    newNode->nodeId = (char*)malloc(10*sizeof(char));
 
     listP tempList = myGraph->adjList;
 
     while(tempList != NULL){
-        if( !strcmp(tempList->head->nodeId, nodeIdentifier) ){
+        if( !strcmp(tempList->nodeId, nodeIdentifier) ){
             printf("Node %s already exists. Aborting insertion operation and returning to option selection.\n", nodeIdentifier);
             return -1;
         }
@@ -57,33 +56,28 @@ int createNode(graphP myGraph, char *nodeIdentifier){
             break;
     }
 
-    strcpy(newNode->head->nodeId, nodeIdentifier);
+    strcpy(newNode->nodeId, nodeIdentifier);
     newNode->next = NULL;
 
-    strcpy(tempList->head->nodeId, newNode->head->nodeId);
-
-    tempList->head->destId = newNode->head->destId;
-    tempList->head->next = (nodeP)malloc(sizeof(node));
-    tempList->head->next->nodeId = (char*)malloc(sizeof(char));
+    strcpy(tempList->nodeId, newNode->nodeId);
+    tempList->head = (edgeP)malloc(sizeof(edge));
+    tempList->head->edgeId = (char*)malloc(10*sizeof(char));
     tempList->next = (listP)malloc(sizeof(list));
-    tempList->next->head = (nodeP)malloc(sizeof(node));
-    tempList->next->head->nodeId = (char*)malloc(sizeof(char));
+    tempList->next->nodeId = (char*)malloc(sizeof(char));
 
-    printf("templist %s", tempList->head->nodeId );
     myGraph->num_vertices++;
 
     return 1;
 }
 
 /* Function to delete an adjacency list node*/
-int createNode(graphP myGraph, char *nodeIdentifier){
+int deleteNode(graphP myGraph, char *nodeIdentifier){
 
     listP tempList = myGraph->adjList;
 
     while(tempList != NULL){
-        if( !strcmp(tempList->head->nodeId, nodeIdentifier) ){
-            printf("Node %s already exists. Aborting insertion operation and returning to option selection.\n", nodeIdentifier);
-            return -1;
+        if( !strcmp(tempList->nodeId, nodeIdentifier) ){
+            
         }
         if(tempList->next != NULL){
             tempList = tempList->next;
@@ -92,7 +86,6 @@ int createNode(graphP myGraph, char *nodeIdentifier){
             break;
     }
 
-    printf("templist %s", tempList->head->nodeId );
     myGraph->num_vertices++;
 
     return 1;
@@ -106,11 +99,11 @@ graphP createGraph(){
         err_exit("Unable to allocate memory for graph");
 
     graph->adjList = (listP)malloc(sizeof(list));
-    graph->adjList->head = (nodeP)malloc(sizeof(node));
-    graph->adjList->head->nodeId = (char*)malloc(10*sizeof(char));
+    graph->adjList->nodeId = (char*)malloc(10*sizeof(char));
     // graph->adjList->head->nodeId = "gweoij";
-    graph->adjList->head->next = (nodeP)malloc(sizeof(node));
-    graph->adjList->head->next = NULL;
+    graph->adjList->head = (edgeP)malloc(sizeof(edge));
+    graph->adjList->head->next = (edgeP)malloc(sizeof(edge));
+    graph->adjList->next = NULL;
     graph->adjList->next = (listP)malloc(sizeof(list));
     graph->adjList->next = NULL;
     //Store number of vertices
@@ -129,9 +122,9 @@ void destroyGraph(graphP graph){
             /*Free up the nodes*/
             listP tempList = graph->adjList;
             while(tempList){
-                nodeP adjListPtr = graph->adjList->head;
+                edgeP adjListPtr = graph->adjList->head;
                 while (adjListPtr){
-                    nodeP tmp = adjListPtr;
+                    edgeP tmp = adjListPtr;
                     adjListPtr = adjListPtr->next;
                     free(tmp);
                 }
@@ -151,9 +144,9 @@ void destroyGraph(graphP graph){
 int addEdge(graph *graph, char *idSource, char *idDest, int weight){
     /* Add an edge from src to dst in the adjacency list*/
     listP tempList = graph->adjList;
-    nodeP destNode = NULL;
+    edgeP destNode = NULL;
     while(tempList){
-        if( !strcmp(tempList->head->nodeId, idDest) )
+        if( !strcmp(tempList->nodeId, idDest) )
             destNode = tempList->head;
         tempList = tempList->next;
     }
@@ -163,14 +156,24 @@ int addEdge(graph *graph, char *idSource, char *idDest, int weight){
     }
     tempList = graph->adjList;
     while(tempList){
-        if( !strcmp(tempList->head->nodeId, idSource) ){
-            nodeP tempNode = tempList->head;
+        if( !strcmp(tempList->nodeId, idSource) ){
+            edgeP tempEdge = tempList->head;
+            while(tempEdge != NULL){
+                if(tempEdge->next != NULL){
+                    tempEdge = tempEdge->next;
+                }
+                else
+                    break; 
+            }
             //Add Edge
+            strcpy(tempEdge->edgeId, idDest);
+            tempEdge->edgeWeight = weight;
+            tempEdge->next = (edgeP)malloc(sizeof(edge));
+            tempEdge->next->edgeId = (char*)malloc(sizeof(char));
         }
         tempList = tempList->next;
     }
-    //newNode->next = graph->adjList->head;
-    //graph->adjList->head = newNode;
+
     graph->adjList->num_members++;
 }
 

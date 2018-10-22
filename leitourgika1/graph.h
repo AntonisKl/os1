@@ -3,19 +3,19 @@
 #define _GRAPH_H_
 
 /* Adjacency list node*/
-typedef struct node
+typedef struct edge
 {
-	char *nodeId;
-	char *destId;
+	char *edgeId;
 	int edgeWeight;
-    struct node *next; /*Pointer to the next node*/
-}node, *nodeP;
+    struct edge *next; /*Pointer to the next node*/
+}edge, *edgeP;
 
 /* Adjacency list */
 typedef struct adjlist
 {
     int num_members;           /*number of members in the list (for future use)*/
-    node *head;      /*head of the adjacency linked list*/
+    char *nodeId;
+    edge *head;
     struct adjlist *next;
 }list, *listP;
 
