@@ -239,7 +239,36 @@ int circleFind(graphP myGraph, char *nodeId,  struct StackNode *path){
     }
 }
 
-void findCircles(graphP myGraph, char *nodeId, int minWeight){
+int findCircles(graphP myGraph, char *nodeId, char *firstNode, int minWeight, struct StackNode* path){
+
+    listP tempList = myGraph->adjList;
+    
+    while(tempList){
+        if( !strcmp(tempList->nodeId, nodeId)){
+
+            edgeP tempEdge = tempList->head;
+
+            while(tempEdge){
+                //printf("stack %s", tempEdge->edgeId);
+                if(exists(path, firstNode) && tempEdge->edgeWeight >= minWeight){
+                    printf("Circle Found:");
+                    while(!isEmpty(path))
+                        printf("%s -> ", pop(&path));
+                    printf("\n");
+                    return 1;
+                }
+                else{
+                    if( tempEdge->edgeWeight >= minWeight ){
+                        push(&path, tempEdge->edgeId);
+                        findCircles(myGraph, tempEdge->edgeId, firstNode, minWeight, path);
+                    }
+                }
+                path = NULL;
+                tempEdge = tempEdge->next;
+            }
+        }
+        tempList = tempList->next;
+    }
 
 }
 
@@ -297,14 +326,21 @@ int addEdge(graph *graph, char *idSource, char *idDest, int weight){
     /* Add an edge from src to dst in the adjacency list*/
     listP tempList = graph->adjList;
     edgeP destNode = NULL;
+    edgeP sourceNode = NULL;
     while(tempList){
         if( !strcmp(tempList->nodeId, idDest) )
             destNode = tempList->head;
+        if( !strcmp(tempList->nodeId, idSource))
+            sourceNode = tempList->head;
         tempList = tempList->next;
     }
     if( destNode == NULL){
-        printf("%s does not exist as a node. Aborting insert edge operation and returning to option select.\n", idDest);
-        return -1;
+        printf("%s does not exist as a node. Inserting node then returning to edge insertion.\n", idDest);
+        createNode(graph, idDest);
+    }
+    if( sourceNode == NULL){
+        printf("%s does not exist as a node. Inserting node then returning to edge insertion.\n", idSource);
+        createNode(graph, idSource);
     }
     tempList = graph->adjList;
     while(tempList){

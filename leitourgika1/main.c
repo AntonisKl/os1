@@ -79,8 +79,10 @@ int checkUserInput(char **tokens, graphP mygraph){
 		return 0;
 	}
 	else if( !strcmp(tokens[0], "f") ){
-		if(count == 3)
-			findCircles(mygraph, tokens[1], atoi(tokens[2]));
+		if(count == 3){
+			struct StackNode* path = NULL; 
+			findCircles(mygraph, tokens[1], tokens[1], atoi(tokens[2]), path);
+		}
 		else
 			err_exit("Wrong number of Arguments.");
 		return 0;
@@ -113,9 +115,9 @@ int main(int argc, char *argv[]){
 	/* Checking for Command Line Arguments */
     if(argc == 1)
         fptr = NULL;
-    else if( argc == 3 && !!strcmp(argv[1], "-i"))
+    else if( argc == 3 && !strcmp(argv[1], "-i"))
     	fptr = fopen(argv[2], "r");
-    else if( argc == 3 && !!strcmp(argv[1], "-o"))
+    else if( argc == 3 && !strcmp(argv[1], "-o"))
     	fptr = fopen(argv[2], "w+");
     else if( argc == 5 ){
     	fptr = fopen(argv[2], "r");
@@ -134,12 +136,14 @@ int main(int argc, char *argv[]){
     }
 
     while(exit){
-    	menuOpts();
-		fgets(userOpt, 50, stdin);
-    	//scanf("opt", &userOpt);
+    	//menuOpts();
+		if( fptr == NULL )
+			fgets(userOpt, 50, stdin);
+		else
+			fgets(userOpt, 50, fptr);
+    	puts(userOpt);
     	i = 0;
     	token[i] = strtok(userOpt, " \n");
-		//Check this assignment tomorrow
     	while( token[i] != NULL){
     		i++;
 			token[i] = strtok(NULL, " \n");
