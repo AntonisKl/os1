@@ -70,24 +70,32 @@ int checkUserInput(char **tokens, graphP mygraph){
 		return 0;
 	}
 	else if( !strcmp(tokens[0], "c") ){
-		if(count == 2)
-			circleFind(mygraph, tokens[1]);
+		if(count == 2){
+			struct StackNode* path = NULL; 
+			circleFind(mygraph, tokens[1], path);
+		}
 		else
 			err_exit("Wrong number of Arguments.");
 		return 0;
 	}
 	else if( !strcmp(tokens[0], "f") ){
 		if(count == 3)
-			findCircles(mygraph, tokens[1], tokens[2]);
+			findCircles(mygraph, tokens[1], atoi(tokens[2]));
 		else
 			err_exit("Wrong number of Arguments.");
 		return 0;
 	}
 	else if( !strcmp(tokens[0], "t") ){
-		printf("Input is t\n");
+		if(count == 4)
+			traceFlow(mygraph, tokens[1], tokens[2], atoi(tokens[3]), 0);
+		else
+			err_exit("Wrong number of Arguments.");
+		return 0;
 	}
-	else if( !strcmp(tokens[0], "e") )
+	else if( !strcmp(tokens[0], "e") ){
+		destroyGraph(mygraph);
 		return 1;
+	}
 	else{
 		errCatch("Invalid command");
 		return 0;

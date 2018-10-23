@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "graph.h"
+#include "stack.c"
 
 /* 
     A graph is comprised of a list (in our case, the nodes) 
@@ -16,11 +17,14 @@ void err_exit(char* msg){
     exit(1);
 }
 
-/* Function to print the adjacency list of graph*/
+/* 
+ * Function to print the graph
+ * Format is: node: \t edges that start from the node \n
+ */
 void displayGraph(graphP graph){
     int i;
     listP tempList = graph->adjList;
-    while(tempList->next != NULL){
+    while(tempList != NULL){
         edgeP adjListPtr = tempList->head;
         printf("%s: \t", tempList->nodeId);
         while (adjListPtr != NULL){
@@ -32,15 +36,10 @@ void displayGraph(graphP graph){
     }
 }
 
-/* Function to create an adjacency list node*/
+/* Function to create a graph node*/
 int createNode(graphP myGraph, char *nodeIdentifier){
-    //displayGraph(myGraph);
-    listP newNode = (listP)malloc(sizeof(list));
     if(!newNode)
         err_exit("Unable to allocate memory for new node");
-
-    newNode->head = (edgeP)malloc(sizeof(edge));
-    newNode->nodeId = (char*)malloc(10*sizeof(char));
 
     listP tempList = myGraph->adjList;
 
@@ -49,17 +48,14 @@ int createNode(graphP myGraph, char *nodeIdentifier){
             printf("Node %s already exists. Aborting insertion operation and returning to option selection.\n", nodeIdentifier);
             return -1;
         }
-        if(tempList->next != NULL){
+        if(tempList->next != NULL){            
             tempList = tempList->next;
         }
         else
             break;
     }
 
-    strcpy(newNode->nodeId, nodeIdentifier);
-    newNode->next = NULL;
-
-    strcpy(tempList->nodeId, newNode->nodeId);
+    strcpy(tempList->nodeId, nodeIdentifier);
     tempList->head = (edgeP)malloc(sizeof(edge));
     tempList->head->edgeId = (char*)malloc(10*sizeof(char));
     tempList->next = (listP)malloc(sizeof(list));
@@ -91,6 +87,10 @@ int createNode(graphP myGraph, char *nodeIdentifier){
 //   return currP;
 // }
 
+/*
+ * Function that deletes a top-level node from the graph,
+ * together with its edges
+ */
 listP nodeDelete(listP currP, char *id)
 {
   /* See if we are at end of list. */
@@ -100,6 +100,7 @@ listP nodeDelete(listP currP, char *id)
     listP tempNextP;
     edgeP currEdge = currP->head;
     edgeP nextEdge;
+    //Free each edge that belongs to that node
     while(currEdge!=NULL){
         nextEdge = currEdge->next;
         free(currEdge);
@@ -117,15 +118,19 @@ int deleteEdge(graphP myGraph, char *nodeId, char *edgeId, int weight){
     //myGraph->adjList = edgeDelete(myGraph->adjList, nodeId, edgeId, weight);
     listP tempList = myGraph->adjList;
     while(tempList != NULL){
-        edgeP tempEdge = tempList->head;
-        edgeP nextEdge;
-        while(tempEdge != NULL){
-            if( !strcmp(tempEdge->edgeId, edgeId) && tempEdge->edgeWeight == weight ){
-                nextEdge = tempEdge->next;
-                free(tempEdge);
-                tempEdge = nextEdge;
+        if( !strcmp(tempList->nodeId, nodeId) ){
+            edgeP tempEdge = tempList->head;
+            edgeP nextEdge;
+            while(tempEdge != NULL){
+                if( !strcmp(tempEdge->edgeId, edgeId) && tempEdge->edgeWeight == weight ){
+                    nextEdge = tempEdge->next;
+                    tempList->head = nextEdge;
+                    free(tempEdge);
+                    tempEdge = nextEdge;                    
+                    return 1;
+                }
+                tempEdge = tempEdge->next;
             }
-            tempEdge = tempEdge->next;
         }
         tempList = tempList->next;
     }
@@ -165,6 +170,77 @@ int showTransactions(graphP myGraph, char *receivingNodeId){
         }
         tempList = tempList->next;
     } 
+}
+
+int traceFlow( graphP myGraph, char *nodeIdStart, char *nodeIdEnd, int maxRouteLength, int total_cost){
+    listP tempList = myGraph->adjList;
+    listP testNode = NULL;
+    edgeP testEdge = NULL;
+    while(tempList){
+        if(!strcmp(tempList->nodeId, nodeIdStart)){
+            testNode = tempList;
+            if( maxRouteLength == 1 ){
+                edgeP tempEdge = tempList->head;
+                while(tempEdge){
+                    if( !strcmp(tempEdge->edgeId, nodeIdEnd) ){
+                        testEdge = tempEdge;
+                        total_cost += tempEdge->edgeWeight;
+                        printf("Route found with total cost %d ", total_cost);
+                    }
+                    tempEdge = tempEdge->next;
+                }
+            }
+            else{
+                edgeP tempEdge = tempList->head;
+                while(tempEdge){
+                    traceFlow(myGraph, tempEdge->edgeId, nodeIdEnd, maxRouteLength-1, total_cost+tempEdge->edgeWeight);
+                    tempEdge = tempEdge->next;
+                }
+            }
+        }
+        tempList = tempList->next;
+    }
+    if(testNode == NULL){
+        printf("Node %s does not exist", nodeIdStart);
+        return 1;
+    }
+    if(testEdge == NULL){
+        printf("Node %s does not exist", nodeIdEnd);
+        return 1;
+    }
+}
+
+int circleFind(graphP myGraph, char *nodeId,  struct StackNode *path){
+    listP tempList = myGraph->adjList;
+    
+    while(tempList){
+        if( !strcmp(tempList->nodeId, nodeId)){
+
+            edgeP tempEdge = tempList->head;
+
+            while(tempEdge){
+                //printf("stack %s", tempEdge->edgeId);
+                if(exists(path, tempEdge->edgeId)){
+                    printf("Circle Found:");
+                    while(!isEmpty(path))
+                        printf("%s -> ", pop(&path));
+                    printf("\n");
+                    return 1;
+                }
+                else{
+                    push(&path, tempEdge->edgeId);
+                    circleFind(myGraph, tempEdge->edgeId, path);
+                }
+                path = NULL;
+                tempEdge = tempEdge->next;
+            }
+        }
+        tempList = tempList->next;
+    }
+}
+
+void findCircles(graphP myGraph, char *nodeId, int minWeight){
+
 }
 
 /* Function to create a graph with n vertices*/
