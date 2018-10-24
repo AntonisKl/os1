@@ -3,6 +3,9 @@
 #include <string.h>
 #include "graph.h"
 #include "stack.c"
+#include "shared.h"
+
+FILE *fptrWrite;
 
 /* 
     A graph is comprised of a list (in our case, the nodes) 
@@ -11,10 +14,11 @@
     for when the user wants to add a new edge between two nodes. 
 */
 
-/* Exit function to handle fatal errors*/
+/*
+ * Exit function to handle fatal errors
+ */
 void err_exit(char* msg){
-    printf("Error: %s \nExiting...\n", msg);
-    exit(1);
+    printf("Error: %s \nReturning...\n", msg);
 }
 
 /* 
@@ -26,17 +30,19 @@ void displayGraph(graphP graph){
     listP tempList = graph->adjList;
     while(tempList != NULL){
         edgeP adjListPtr = tempList->head;
-        printf("%s: \t", tempList->nodeId);
+        fprintf(fptrWrite, "%s: \t", tempList->nodeId);
         while (adjListPtr != NULL){
-            printf("%s/%d ->", adjListPtr->edgeId, adjListPtr->edgeWeight);
+            fprintf(fptrWrite, "%s/%d ->", adjListPtr->edgeId, adjListPtr->edgeWeight);
             adjListPtr = adjListPtr->next;
         }
-        printf("\n");
+        fprintf(fptrWrite, "\n");
         tempList = tempList->next;
     }
 }
 
-/* Function to create a graph node*/
+/*
+ * Function to create a graph node
+ */
 int createNode(graphP myGraph, char *nodeIdentifier){
     if(!newNode)
         err_exit("Unable to allocate memory for new node");
@@ -45,7 +51,7 @@ int createNode(graphP myGraph, char *nodeIdentifier){
 
     while(tempList != NULL){
         if( !strcmp(tempList->nodeId, nodeIdentifier) ){
-            printf("Node %s already exists. Aborting insertion operation and returning to option selection.\n", nodeIdentifier);
+            fprintf(fptrWrite, "Node |%s| Exists;\n", nodeIdentifier);
             return -1;
         }
         if(tempList->next != NULL){            
@@ -62,30 +68,9 @@ int createNode(graphP myGraph, char *nodeIdentifier){
     tempList->next->nodeId = (char*)malloc(sizeof(char));
 
     myGraph->num_vertices++;
-
+    fprintf(fptrWrite, "- Inserted |%s|\n",nodeIdentifier);
     return 1;
 }
-
-// listP edgeDelete(listP currP, char *nodeId, char *edgeId, int weight){
-//   /* See if we are at end of list. */
-//   if (currP == NULL)
-//     return NULL;
-//   if (!strcmp(currP->nodeId, nodeId)) {
-//     listP tempNextP;
-//     edgeP currEdge = currP->head;
-//     edgeP nextEdge;
-//     while(currEdge!=NULL){
-        // if( !strcmp(currEdge->edgeId, edgeId) && currEdge->edgeWeight == weight ){
-        //     nextEdge = currEdge->next;
-        //     free(currEdge);
-        //     currEdge = nextEdge;
-        // }
-        // currEdge = currEdge->next;
-//     }
-//   }
-//   currP->next = edgeDelete(currP->next, nodeId, edgeId, weight);
-//   return currP;
-// }
 
 /*
  * Function that deletes a top-level node from the graph,
@@ -94,8 +79,10 @@ int createNode(graphP myGraph, char *nodeIdentifier){
 listP nodeDelete(listP currP, char *id)
 {
   /* See if we are at end of list. */
-  if (currP == NULL)
+  if (currP == NULL){
+    fprintf(fptrWrite, "Node |%s| does not exist - abort-d;\n", id);
     return NULL;
+  }
   if (!strcmp(currP->nodeId, id)) {
     listP tempNextP;
     edgeP currEdge = currP->head;
@@ -114,6 +101,9 @@ listP nodeDelete(listP currP, char *id)
   return currP;
 }
 
+/*
+ * Function used to delete an edge between two nodes
+ */
 int deleteEdge(graphP myGraph, char *nodeId, char *edgeId, int weight){
     //myGraph->adjList = edgeDelete(myGraph->adjList, nodeId, edgeId, weight);
     listP tempList = myGraph->adjList;
@@ -136,42 +126,92 @@ int deleteEdge(graphP myGraph, char *nodeId, char *edgeId, int weight){
     }
 }
 
+
+/*
+ * Function used to modify the weight of an edge between two nodes
+ */
 int modifyWeight( graphP myGraph, char *nodeId, char *edgeId, int oldWeight, int newWeight){
     listP tempList = myGraph->adjList;
+    int countList = 0, countEdge = 0, countWeight = 0;
     while(tempList != NULL){
-        edgeP tempEdge = tempList->head;
-        while(tempEdge != NULL){
-            if( !strcmp(tempEdge->edgeId, edgeId) && tempEdge->edgeWeight == oldWeight ){
-                tempEdge->edgeWeight = newWeight;
-                return 1;
+        if(!strcmp(tempList->nodeId, nodeId)){
+            edgeP tempEdge = tempList->head;        
+            while(tempEdge != NULL){
+                if( !strcmp(tempEdge->edgeId, edgeId)){
+                    if (tempEdge->edgeWeight == oldWeight ){
+                        tempEdge->edgeWeight = newWeight;
+                        fprintf(fptrWrite, "- Mod-vertex |%s|->%d->|%s|\n", nodeId, newWeight, edgeId);
+                        return 1;
+                    }
+                    else{
+                        countWeight ++;
+                    }
+                }
+                else{
+                    countEdge++;
+                }
+                tempEdge = tempEdge->next;
+                if(countEdge == tempList->num_members){
+                    fprintf(fptrWrite, "- |%s| does not exist - abort-m;\n", edgeId);
+                    return 0;
+                }
+                if(countWeight == tempList->num_members){
+                    fprintf(fptrWrite, "- |%s|->%d->|%s| does not exist - abort-m;\n", nodeId, oldWeight, edgeId);
+                    return 0;
+                }
             }
-            tempEdge = tempEdge->next;
+        }
+        else{
+            countList ++;
         }
         tempList = tempList->next;
+        if(countList == myGraph->num_vertices){
+            fprintf(fptrWrite, "- |%s| does not exist - abort-m;\n", nodeId);
+            return 0;
+        }        
     }
 }
 
-/* Function to delete an adjacency list node*/
+/* 
+ * Function to delete an adjacency list node
+ */
 int deleteNode(graphP myGraph, char *nodeIdentifier){
     myGraph->adjList = nodeDelete(myGraph->adjList, nodeIdentifier);
+    fprintf(fptrWrite, "Deleted |%s|\n", nodeIdentifier);
     return 1;
 }
 
+/*
+ * Function used to show receiving transactions of a node in the graph
+ */
 int showTransactions(graphP myGraph, char *receivingNodeId){
     listP tempList = myGraph->adjList;
-    while(tempList){
+    int countNodes = 0;
+    fprintf(fptrWrite, "- No-rec-edges %s\n", receivingNodeId);
+    fprintf(fptrWrite, "- Rec-edges ");
+    while(tempList){        
         edgeP tempEdge = tempList->head;
         while(tempEdge){
-            if(!strcmp(tempEdge->edgeId, receivingNodeId)){
-                printf("Node %s is receiving a transaction weighing %d from node %s\n", 
-                tempEdge->edgeId, tempEdge->edgeWeight, tempList->nodeId);
+            if(!strcmp(tempEdge->edgeId, receivingNodeId)){                
+                fprintf(fptrWrite, "|%s|->%d->|%s|\n", tempList->nodeId, tempEdge->edgeWeight, tempEdge->edgeId);
+                countNodes--;
+            }
+            else{
+                countNodes++;
             }
             tempEdge = tempEdge->next;
         }
         tempList = tempList->next;
+        if(countNodes == myGraph->num_vertices){
+            fprintf(fptrWrite, "- |%s| does not exist - abort-r;\n", receivingNodeId);
+            return 0;
+        }
     } 
 }
 
+/*
+ * Function used to trace cash flow between two graph nodes
+ */
 int traceFlow( graphP myGraph, char *nodeIdStart, char *nodeIdEnd, int maxRouteLength, int total_cost){
     listP tempList = myGraph->adjList;
     listP testNode = NULL;
@@ -185,8 +225,9 @@ int traceFlow( graphP myGraph, char *nodeIdStart, char *nodeIdEnd, int maxRouteL
                     if( !strcmp(tempEdge->edgeId, nodeIdEnd) ){
                         testEdge = tempEdge;
                         total_cost += tempEdge->edgeWeight;
-                        printf("Route found with total cost %d ", total_cost);
-                    }
+                        fprintf(fptrWrite, "- Tra-found %d", total_cost);
+                        return 1;
+                    }                    
                     tempEdge = tempEdge->next;
                 }
             }
@@ -201,30 +242,35 @@ int traceFlow( graphP myGraph, char *nodeIdStart, char *nodeIdEnd, int maxRouteL
         tempList = tempList->next;
     }
     if(testNode == NULL){
-        printf("Node %s does not exist", nodeIdStart);
+        fprintf(fptrWrite, "|%s| does not exist - abort-l;\n", nodeIdStart);
         return 1;
     }
-    if(testEdge == NULL){
-        printf("Node %s does not exist", nodeIdEnd);
+    else if(testEdge == NULL){
+        fprintf(fptrWrite, "|%s| does not exist - abort-l;\n", nodeIdEnd);
+        return 1;
+    }
+    else{
+        fprintf(fptrWrite, "- No-trace from |%s| to |%s|\n", nodeIdStart, nodeIdEnd);
         return 1;
     }
 }
 
+/*
+ * Function used to find simple circles in graph
+ */
 int circleFind(graphP myGraph, char *nodeId,  struct StackNode *path){
     listP tempList = myGraph->adjList;
-    
+    edgeP countEdge = NULL;
     while(tempList){
         if( !strcmp(tempList->nodeId, nodeId)){
-
             edgeP tempEdge = tempList->head;
-
             while(tempEdge){
-                //printf("stack %s", tempEdge->edgeId);
                 if(exists(path, tempEdge->edgeId)){
-                    printf("Circle Found:");
+                    fprintf(fptrWrite, "- Cir-found");
                     while(!isEmpty(path))
-                        printf("%s -> ", pop(&path));
-                    printf("\n");
+                        fprintf(fptrWrite, "|%s|->%d->", pop(&path), tempEdge->edgeWeight);
+                    fprintf(fptrWrite, "\n");
+                    countEdge = tempEdge;
                     return 1;
                 }
                 else{
@@ -237,24 +283,25 @@ int circleFind(graphP myGraph, char *nodeId,  struct StackNode *path){
         }
         tempList = tempList->next;
     }
+    if(countEdge == NULL){
+        fprintf(fptrWrite, "- |%s| does not exist - abort-c;", nodeId);
+    }
 }
 
 int findCircles(graphP myGraph, char *nodeId, char *firstNode, int minWeight, struct StackNode* path){
 
     listP tempList = myGraph->adjList;
-    
+    edgeP countEdge = NULL;
     while(tempList){
         if( !strcmp(tempList->nodeId, nodeId)){
-
             edgeP tempEdge = tempList->head;
-
             while(tempEdge){
-                //printf("stack %s", tempEdge->edgeId);
                 if(exists(path, firstNode) && tempEdge->edgeWeight >= minWeight){
-                    printf("Circle Found:");
+                    fprintf(fptrWrite, "- Cir-found");
                     while(!isEmpty(path))
-                        printf("%s -> ", pop(&path));
-                    printf("\n");
+                        fprintf(fptrWrite, "%s -> ", pop(&path));
+                    fprintf(fptrWrite, "\n");
+                    countEdge = tempEdge;
                     return 1;
                 }
                 else{
@@ -269,6 +316,10 @@ int findCircles(graphP myGraph, char *nodeId, char *firstNode, int minWeight, st
         }
         tempList = tempList->next;
     }
+    if(countEdge == NULL){
+       fprintf(fptrWrite, "- |%s| does not exist - abort-f;\n", nodeId);
+    }
+    fprintf(fptrWrite, "- No-circle-found involving |%s| %d\n", nodeId, minWeight);
 
 }
 
@@ -281,7 +332,6 @@ graphP createGraph(){
 
     graph->adjList = (listP)malloc(sizeof(list));
     graph->adjList->nodeId = (char*)malloc(10*sizeof(char));
-    // graph->adjList->head->nodeId = "gweoij";
     graph->adjList->head = (edgeP)malloc(sizeof(edge));
     graph->adjList->head->next = (edgeP)malloc(sizeof(edge));
     graph->adjList->next = NULL;
@@ -292,7 +342,6 @@ graphP createGraph(){
 
     //Initialize adjacency list nodes
     graph->adjList->num_members = 0;
-    displayGraph(graph);
     return graph;
 }
 
@@ -303,7 +352,7 @@ void destroyGraph(graphP graph){
             /*Free up the nodes*/
             listP tempList = graph->adjList;
             while(tempList){
-                edgeP adjListPtr = graph->adjList->head;
+                edgeP adjListPtr = tempList->head;
                 while (adjListPtr){
                     edgeP tmp = adjListPtr;
                     adjListPtr = adjListPtr->next;
@@ -314,7 +363,7 @@ void destroyGraph(graphP graph){
                 free(freeList);
             }
             /*Free the adjacency list array*/
-            free(graph->adjList);
+            //free(graph->adjList);
         }
         /*Free the graph*/
         free(graph);
@@ -335,11 +384,9 @@ int addEdge(graph *graph, char *idSource, char *idDest, int weight){
         tempList = tempList->next;
     }
     if( destNode == NULL){
-        printf("%s does not exist as a node. Inserting node then returning to edge insertion.\n", idDest);
         createNode(graph, idDest);
     }
     if( sourceNode == NULL){
-        printf("%s does not exist as a node. Inserting node then returning to edge insertion.\n", idSource);
         createNode(graph, idSource);
     }
     tempList = graph->adjList;
@@ -361,7 +408,7 @@ int addEdge(graph *graph, char *idSource, char *idDest, int weight){
         }
         tempList = tempList->next;
     }
-
+    fprintf(fptrWrite, "- Inserted |%s|->%d->|%s|\n", idSource, weight, idDest);
     graph->adjList->num_members++;
 }
 

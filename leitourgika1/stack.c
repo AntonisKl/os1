@@ -29,7 +29,6 @@ void push(struct StackNode** root, char *data)
     struct StackNode* stackNode = newNode(data); 
     stackNode->next = *root; 
     *root = stackNode; 
-    printf("%s pushed to stack\n", data); 
 } 
   
 char *pop(struct StackNode** root) 

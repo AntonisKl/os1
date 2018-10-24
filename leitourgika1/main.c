@@ -3,6 +3,9 @@
 #include "graph.c"
 #include <string.h>
 #include <stdbool.h>
+#include "shared.h"
+
+FILE *fptrWrite;
 
 void errCatch(char* errmsg){
 	printf("Error: %s\n", errmsg);
@@ -27,10 +30,10 @@ int checkUserInput(char **tokens, graphP mygraph){
 	while( tokens[count] != NULL )
 		count++;
 	if(  !strcmp(tokens[0], "i") ){
-		if(!strcmp(tokens[1], "\0"))
-			errCatch("Wrong Number of Arguments.");
-		else
+		if(count == 2)
 			createNode(mygraph, tokens[1]);
+		else
+			errCatch("Wrong Number of Arguments.");			
 		return 0;
 		// printf("%s\n",mygraph->)
 	}
@@ -108,23 +111,30 @@ int checkUserInput(char **tokens, graphP mygraph){
 int main(int argc, char *argv[]){
 
 	FILE *fptr;
-	int i;
-
+	int i, verbose = 0;
 	graphP myGraph = createGraph();	
-	//displayGraph(myGraph);
+
 	/* Checking for Command Line Arguments */
-    if(argc == 1)
+    if(argc == 1){
         fptr = NULL;
+		fptrWrite = NULL;
+	}
     else if( argc == 3 && !strcmp(argv[1], "-i"))
     	fptr = fopen(argv[2], "r");
     else if( argc == 3 && !strcmp(argv[1], "-o"))
-    	fptr = fopen(argv[2], "w+");
+    	fptrWrite = fopen(argv[2], "w+");
     else if( argc == 5 ){
     	fptr = fopen(argv[2], "r");
-    	fptr = fopen(argv[4], "w+");
+    	fptrWrite = fopen(argv[4], "w+");
     }
+	else if( argc == 6 && !strcmp(argv[5], "-v"))
+		verbose = 1;
     else
     	errCatch("Wrong number/format of arguments.");
+
+	if(fptrWrite == NULL){
+		fptrWrite = stdout;
+	}
 
     bool exit = true;
     //userOpt stores the user's option in each loop iteration
@@ -135,13 +145,14 @@ int main(int argc, char *argv[]){
     	token[i] = malloc(10 * sizeof(char));
     }
 
+	menuOpts();
     while(exit){
-    	//menuOpts();
+		if(verbose == 1)
+			menuOpts();
 		if( fptr == NULL )
 			fgets(userOpt, 50, stdin);
 		else
 			fgets(userOpt, 50, fptr);
-    	puts(userOpt);
     	i = 0;
     	token[i] = strtok(userOpt, " \n");
     	while( token[i] != NULL){
@@ -150,7 +161,11 @@ int main(int argc, char *argv[]){
 		}
     	if(checkUserInput(token, myGraph) == 1)
     		exit = false;
-		displayGraph(myGraph);
     }
+
+	if( fptr != NULL)
+		fclose(fptr);
+	if( fptrWrite != NULL)
+		fclose(fptrWrite);
 
 }
