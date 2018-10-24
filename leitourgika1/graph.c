@@ -292,6 +292,10 @@ int traceFlow( graphP myGraph, char *nodeIdStart, char *nodeIdEnd, int maxRouteL
                     }                    
                     tempEdge = tempEdge->next;
                 }
+                if(testEdge == NULL){
+                    fprintf(fptrWrite, "|%s| does not exist - abort-l;\n", nodeIdEnd);
+                    return 1;
+                }
             }
             else{
                 edgeP tempEdge = tempList->head;
@@ -306,10 +310,6 @@ int traceFlow( graphP myGraph, char *nodeIdStart, char *nodeIdEnd, int maxRouteL
     //Check if node1 and node2 passed as arguments exist
     if(testNode == NULL){
         fprintf(fptrWrite, "|%s| does not exist - abort-l;\n", nodeIdStart);
-        return 1;
-    }
-    else if(testEdge == NULL){
-        fprintf(fptrWrite, "|%s| does not exist - abort-l;\n", nodeIdEnd);
         return 1;
     }
     else{
