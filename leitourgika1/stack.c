@@ -1,14 +1,8 @@
-// C program for linked list implementation of stack 
 #include <stdio.h> 
 #include <stdlib.h> 
-#include <limits.h> 
-  
-// A structure to represent a stack 
-struct StackNode 
-{ 
-    char *data; 
-    struct StackNode* next; 
-}; 
+#include <limits.h>
+#include <string.h>
+#include "stack.h"
   
 struct StackNode* newNode(char *data) 
 { 

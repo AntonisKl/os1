@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "graph.h"
-//#include "stack.c"
+#include "stack.h"
 #include "shared.h"
 
 FILE *fptrWrite;

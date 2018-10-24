@@ -2,7 +2,7 @@
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
-#include "stack.c"
+#include "stack.h"
 
 /* Adjacency list node*/
 typedef struct edge

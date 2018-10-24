@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "graph.c"
 #include <string.h>
 #include <stdbool.h>
+#include "stack.h"
+#include "graph.h"
 #include "shared.h"
 
 FILE *fptrWrite;
