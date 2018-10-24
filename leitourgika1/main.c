@@ -25,6 +25,9 @@ void menuOpts(){
 		   "10. e(xit) - Free allocated memory and exit program\n");
 }
 
+/*
+ * Function used to check the input provided by the user and to call the appropriate functions
+ */
 int checkUserInput(char **tokens, graphP mygraph){
 	int count = 0;
 	while( tokens[count] != NULL )
@@ -35,7 +38,6 @@ int checkUserInput(char **tokens, graphP mygraph){
 		else
 			errCatch("Wrong Number of Arguments.");			
 		return 0;
-		// printf("%s\n",mygraph->)
 	}
 	else if( !strcmp(tokens[0], "n") ){
 		if(count == 4)
@@ -54,6 +56,9 @@ int checkUserInput(char **tokens, graphP mygraph){
 	else if( !strcmp(tokens[0], "l") ){
 		if(count == 4)
 			deleteEdge(mygraph, tokens[1], tokens[2], atoi(tokens[3]));
+		else if(count==3){
+			deleteEdgeWithoutWeight(mygraph, tokens[1], tokens[2]);
+		}
 		else
 			err_exit("Wrong number of Arguments.");
 		return 0;
@@ -123,11 +128,17 @@ int main(int argc, char *argv[]){
     	fptr = fopen(argv[2], "r");
     else if( argc == 3 && !strcmp(argv[1], "-o"))
     	fptrWrite = fopen(argv[2], "w+");
-    else if( argc == 5 ){
+    else if( argc == 5 && !strcmp(argv[1], "-i")){
     	fptr = fopen(argv[2], "r");
     	fptrWrite = fopen(argv[4], "w+");
     }
+	else if( argc == 5 && !strcmp(argv[1], "-o")){
+    	fptrWrite = fopen(argv[2], "w+");
+    	fptr = fopen(argv[4], "r");
+    }
 	else if( argc == 6 && !strcmp(argv[5], "-v"))
+		verbose = 1;
+	else if( argc == 2 && !strcmp(argv[1], "-v"))
 		verbose = 1;
     else
     	errCatch("Wrong number/format of arguments.");
@@ -150,9 +161,9 @@ int main(int argc, char *argv[]){
 		if(verbose == 1)
 			menuOpts();
 		if( fptr == NULL )
-			fgets(userOpt, 50, stdin);
+			fgets(userOpt, 100, stdin);
 		else
-			fgets(userOpt, 50, fptr);
+			fgets(userOpt, 100, fptr);
     	i = 0;
     	token[i] = strtok(userOpt, " \n");
     	while( token[i] != NULL){
